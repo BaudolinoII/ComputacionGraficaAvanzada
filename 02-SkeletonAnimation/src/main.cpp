@@ -788,7 +788,7 @@ bool processInput(bool continueApplication) {
 	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
 		modelMatrixHeli = glm::translate(modelMatrixHeli, glm::vec3(0.0, 0.02, 0.0));
 	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-		modelMatrixHeli = glm::translate(modelMatrixHeli, glm::vec3(0.02, -0.02, 0.0));
+		modelMatrixHeli = glm::translate(modelMatrixHeli, glm::vec3(0.0, -0.02, 0.0));
 
 	glfwPollEvents();
 	return continueApplication;
