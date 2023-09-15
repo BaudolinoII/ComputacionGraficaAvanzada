@@ -38,10 +38,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Model.h"
+#include "Shader.h"
 
 class AModel{
     private: std::unordered_map<std::string,size_t> map_model;
-    private: std::vector<Model&> vec_model;
+    private: std::vector<Model> vec_model;
     private: std::string direction;
 
     private: std::string readManifest(const std::string manifest) {
@@ -79,19 +80,20 @@ class AModel{
         }
         return vec;
     }
-    private: void loadModels(std::string args){
+    private: void loadModels(std::string args, std::string shader){
       std::vector<std::string> cmd = makeChain(args);
       std::string order = cmd[0];
+      Shader shad; shad.initialize(shader+ ".vs", shader + ".fs");
       cmd.erase(cmd.begin());
       if (!order.compare("LOAD_MODELS")) //Carga todos los modelos con las direcciones posteriores y almacena en el mapa
         for (std::string s : cmd) {
-          Model mod; mod.loadModel(this->direction + s + ".obj");
+          Model mod; mod.loadModel(this->direction + s + ".obj"); mod.setShader(&shad);
           map_model[s] = vec_model.size();
           this->vec_model.push_back(mod);
         }
     }
     
-    public: AModel(std::string manifesto){
+    public: AModel(std::string manifesto, std::string shader){
         this->direction = manifesto.substr(0, manifesto.find_last_of('/') - manifesto.size());//Extrae la direccion del manifiesto
         std::string corpus = readManifest(manifesto);
         std::vector<std::string> vec;
@@ -102,13 +104,11 @@ class AModel{
             vec = makeChain(subcorp);
             if (!vec.empty())
                 for (std::string s : vec)
-                  this->loadModels(s);
+                  this->loadModels(s, shader);
             begin = line + 1;
             line = corpus.find_first_of('\n', begin);
         }
     } 
     
-    public: Model& getModel(std::string name){
-      return vec_model[map_model[name]];
-    }
+
 };
