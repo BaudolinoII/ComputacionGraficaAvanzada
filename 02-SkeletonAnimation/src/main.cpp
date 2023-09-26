@@ -153,7 +153,7 @@ glm::mat4 modelMatrixLambo = glm::mat4(1.0);
 glm::mat4 modelMatrixAircraft = glm::mat4(1.0);
 glm::mat4 modelMatrixDart = glm::mat4(1.0f);
 glm::mat4 modelMatrixBuzz = glm::mat4(1.0f);
-glm::mat4 modelMatrixLeon = glm::mat4(1.0f);
+glm::mat4 modelMatrixLeon = glm::translate(glm::mat4(1.0f), glm::vec3(12.0f, 0.2f, -5.0f));
 glm::mat4 modelMatrixDragon = glm::mat4(1.0f);
 
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
@@ -161,6 +161,7 @@ float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRig
 int modelSelected = 0;
 bool enableCountSelected = true;
 
+size_t animationLeonIndex = 0;
 // Variables to animations keyframes
 bool saveFrame = false, availableSave = true;
 std::ofstream myfile;
@@ -427,9 +428,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 
 	BuzzRightWing2.loadModel("../models/Buzz/buzzlightyRightWing2.obj");
 	BuzzRightWing2.setShader(&shaderMulLighting);
-
-	modelLeonKen.loadModel("../models/LeonKennedy/Leon_kennedy.obj");
+	//Kennedy
+	modelLeonKen.loadModel("../models/LeonKennedy/Kennedy_IDLE.fbx");
 	modelLeonKen.setShader(&shaderMulLighting);
+
 	modelDragon.loadModel("../models/gato/gato.obj");
 	modelDragon.setShader(&shaderMulLighting);
 
@@ -927,7 +929,26 @@ bool processInput(bool continueApplication) {
 		modelMatrixHeli = glm::translate(modelMatrixHeli, glm::vec3(0.0, 0.02, 0.0));
 	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
 		modelMatrixHeli = glm::translate(modelMatrixHeli, glm::vec3(0.0, -0.02, 0.0));
-
+	// Controles de Kennedy
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+		modelMatrixLeon = glm::rotate(modelMatrixLeon, 0.02f, glm::vec3(0, 1, 0));
+		animationLeonIndex = 0;
+		//std::cout << "Control Leon Activado\n";
+	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+		modelMatrixLeon = glm::rotate(modelMatrixLeon, -0.02f, glm::vec3(0, 1, 0));
+		animationLeonIndex = 0;
+		//std::cout << "Control Leon Activado\n";
+	}
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, 0.02));
+		animationLeonIndex = 0;
+		//std::cout << "Control Leon Activado\n";
+	}
+	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, -0.02));
+		animationLeonIndex = 0;
+		//std::cout << "Control Leon Activado\n";
+	}
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -965,11 +986,11 @@ void applicationLoop() {
 
 	modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(15.0, 0.0, -10.0));
 
-	modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(12.0f, 0.2f, -5.0f));
-	modelMatrixLeon = glm::rotate(modelMatrixLeon,glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-	modelMatrixLeon = glm::scale(modelMatrixLeon, glm::vec3(0.045f));
+	//modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(12.0f, 0.2f, -5.0f));
+	//modelMatrixLeon = glm::rotate(modelMatrixLeon,glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+	
 
-	modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(11.0, 0.0, -2.5));
+	modelMatrixDragon = glm::translate(glm::mat4(1), glm::vec3(11.0, 0.0, -2.5));
 	modelMatrixDragon = glm::rotate(modelMatrixDragon,glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
 	modelMatrixDragon = glm::scale(modelMatrixDragon, glm::vec3(0.03f));
 
@@ -1198,10 +1219,14 @@ void applicationLoop() {
 		modelEclipseRearWheels.render(modelMatrixRearWheels);
 
 		/******************************************
-		 * Leon y Gato
+		 * Leon
 		*******************************************/
-
-		modelLeonKen.render(modelMatrixLeon);
+		glm::mat4 modelMatrixLeonBody = glm::scale(modelMatrixLeon, glm::vec3(0.0025f));
+		modelLeonKen.setAnimationIndex(animationLeonIndex);
+		modelLeonKen.render(modelMatrixLeonBody);
+		animationLeonIndex = 1;
+		
+		
 		modelDragon.render(modelMatrixDragon);
 
 		// Helicopter
@@ -1638,7 +1663,7 @@ void applicationLoop() {
 		}
 		rotHelHelY += (numPasosHeli > 6 ? 0.1 : 0.5);
 		rotHelHelBack += (numPasosHeli > 6 ? 0.1 : 0.5);
-
+		
 		glfwSwapBuffers(window);
 	}
 }
