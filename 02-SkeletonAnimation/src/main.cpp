@@ -429,7 +429,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	BuzzRightWing2.loadModel("../models/Buzz/buzzlightyRightWing2.obj");
 	BuzzRightWing2.setShader(&shaderMulLighting);
 	//Kennedy
-	modelLeonKen.loadModel("../models/LeonKennedy/Kennedy_IDLE.fbx");
+	modelLeonKen.loadModel("../models/LeonKennedy/Kennedy.fbx");
 	modelLeonKen.setShader(&shaderMulLighting);
 
 	modelDragon.loadModel("../models/gato/gato.obj");
@@ -932,21 +932,21 @@ bool processInput(bool continueApplication) {
 	// Controles de Kennedy
 	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
 		modelMatrixLeon = glm::rotate(modelMatrixLeon, 0.02f, glm::vec3(0, 1, 0));
-		animationLeonIndex = 0;
+		animationLeonIndex = 1;
 		//std::cout << "Control Leon Activado\n";
 	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
 		modelMatrixLeon = glm::rotate(modelMatrixLeon, -0.02f, glm::vec3(0, 1, 0));
-		animationLeonIndex = 0;
+		animationLeonIndex = 1;
 		//std::cout << "Control Leon Activado\n";
 	}
 	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
 		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, 0.02));
-		animationLeonIndex = 0;
+		animationLeonIndex = 1;
 		//std::cout << "Control Leon Activado\n";
 	}
 	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
 		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, -0.02));
-		animationLeonIndex = 0;
+		animationLeonIndex = 1;
 		//std::cout << "Control Leon Activado\n";
 	}
 	glfwPollEvents();
@@ -1224,7 +1224,7 @@ void applicationLoop() {
 		glm::mat4 modelMatrixLeonBody = glm::scale(modelMatrixLeon, glm::vec3(0.0025f));
 		modelLeonKen.setAnimationIndex(animationLeonIndex);
 		modelLeonKen.render(modelMatrixLeonBody);
-		animationLeonIndex = 1;
+		animationLeonIndex = 0;
 		
 		
 		modelDragon.render(modelMatrixDragon);
