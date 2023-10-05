@@ -6,6 +6,7 @@
 //std includes
 #include <string>
 #include <iostream>
+#include <cmath>
 
 //glfw include
 #include <GLFW/glfw3.h>
@@ -99,7 +100,7 @@ Model guardianModelAnimate;
 // Cybog
 Model cyborgModelAnimate;
 //Terrenos de la abuela
-Terrain terrain(0,0,200,3,"../Textures/heightmap2.png");
+Terrain terrain(0,0,200, 8,"../Textures/heightmap.png");
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
@@ -602,8 +603,7 @@ void reshapeCallback(GLFWwindow *Window, int widthRes, int heightRes) {
 	glViewport(0, 0, widthRes, heightRes);
 }
 
-void keyCallback(GLFWwindow *window, int key, int scancode, int action,
-		int mode) {
+void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mode) {
 	if (action == GLFW_PRESS) {
 		switch (key) {
 		case GLFW_KEY_ESCAPE:
@@ -945,7 +945,37 @@ void applicationLoop() {
 
 		// Render for the eclipse car
 		glm::mat4 modelMatrixEclipseChasis = glm::mat4(modelMatrixEclipse);
-		modelMatrixEclipseChasis = glm::scale(modelMatrixEclipse, glm::vec3(0.5, 0.5, 0.5));
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*modelMatrixEclipseChasis[3][1] = terrain.getHeightTerrain(modelMatrixEclipseChasis[3][0],modelMatrixEclipseChasis[3][2]);
+		glm::vec3 aY = glm::normalize(terrain.getNormalTerrain(modelMatrixEclipseChasis[3][0],modelMatrixEclipseChasis[3][2]));
+		glm::vec3 aZ = glm::normalize(modelMatrixEclipseChasis[2]);
+		glm::vec3 aX = glm::normalize(glm::cross(aY,aZ));
+		aZ = glm::normalize(glm::cross(aX,aY));
+		modelMatrixEclipseChasis[0] = glm::vec4(aX, 0);
+		modelMatrixEclipseChasis[1] = glm::vec4(aY, 0);
+		modelMatrixEclipseChasis[2] = glm::vec4(aZ, 0);*/
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		float hWheelFrontLeft = terrain.getHeightTerrain(modelMatrixEclipseChasis[3][0] + 0.916287f,modelMatrixEclipseChasis[3][2] + 1.39886f);
+		float hWheelBackLeft = terrain.getHeightTerrain(modelMatrixEclipseChasis[3][0] + 0.916287f,modelMatrixEclipseChasis[3][2] - 1.60137f);
+		float hWheelFrontRight = terrain.getHeightTerrain(modelMatrixEclipseChasis[3][0] - 0.916287f,modelMatrixEclipseChasis[3][2] + 1.39886f);
+		float hWheelBackRight = terrain.getHeightTerrain(modelMatrixEclipseChasis[3][0] - 0.916287f,modelMatrixEclipseChasis[3][2] - 1.60137f);
+
+		float dHeightLeft = (hWheelFrontLeft - hWheelBackLeft); float dHeightRight = hWheelFrontRight - hWheelBackRight; 
+		float dHeightFront = hWheelFrontLeft - hWheelFrontRight; float dHeightBack = hWheelBackLeft - hWheelBackRight; 
+		//float dHeightCrossqb = abs(hWheelFrontLeft - hWheelBackRight); float dHeightCrossdp = abs(hWheelFrontRight - hWheelBackLeft);
+
+		modelMatrixEclipseChasis[3][1] = terrain.getHeightTerrain(modelMatrixEclipseChasis[3][0],modelMatrixEclipseChasis[3][2]);// + (hWheelFrontLeft - hWheelBackRight);
+		//modelMatrixLamboChasis[3][1] = (dHeightCrossqb > dHeightCrossdp ? dHeightCrossqb : dHeightCrossdp);
+
+		float dHX = (abs(dHeightLeft) > abs(dHeightRight) ? dHeightLeft : dHeightRight);
+		float dHZ = (abs(dHeightFront) > abs(dHeightBack) ? dHeightFront : dHeightBack);
+
+		modelMatrixEclipseChasis = glm::rotate(modelMatrixEclipseChasis, glm::sin(glm::radians(dHX)), glm::vec3(1.0f,0.0f,0.0f));
+		modelMatrixEclipseChasis = glm::rotate(modelMatrixEclipseChasis, glm::sin(glm::radians(dHZ)), glm::vec3(0.0f,0.0f,1.0f));
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		modelMatrixEclipseChasis = glm::scale(modelMatrixEclipseChasis, glm::vec3(0.5, 0.5, 0.5));
 		modelEclipseChasis.render(modelMatrixEclipseChasis);
 
 		glm::mat4 modelMatrixFrontalWheels = glm::mat4(modelMatrixEclipseChasis);
@@ -979,8 +1009,42 @@ void applicationLoop() {
 		// Lambo car
 		glDisable(GL_CULL_FACE);
 		glm::mat4 modelMatrixLamboChasis = glm::mat4(modelMatrixLambo);
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		modelMatrixLamboChasis[3][1] = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0],modelMatrixLamboChasis[3][2]);
+		glm::vec3 aY = glm::normalize(terrain.getNormalTerrain(modelMatrixLamboChasis[3][0],modelMatrixLamboChasis[3][2]));
+		glm::vec3 aZ = glm::normalize(modelMatrixLamboChasis[2]);
+		glm::vec3 aX = glm::normalize(glm::cross(aY,aZ));
+		aZ = glm::normalize(glm::cross(aX,aY));
+		modelMatrixLamboChasis[0] = glm::vec4(aX, 0);
+		modelMatrixLamboChasis[1] = glm::vec4(aY, 0);
+		modelMatrixLamboChasis[2] = glm::vec4(aZ, 0);
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*hWheelFrontLeft = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0] + 0.916287f,modelMatrixLamboChasis[3][2] + 1.39886f);
+		hWheelBackLeft = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0] + 0.916287f,modelMatrixLamboChasis[3][2] - 1.60137f);
+		hWheelFrontRight = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0] - 0.916287f,modelMatrixLamboChasis[3][2] + 1.39886f);
+		hWheelBackRight = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0] - 0.916287f,modelMatrixLamboChasis[3][2] - 1.60137f);
+
+		dHeightLeft = hWheelFrontLeft - hWheelBackLeft; dHeightRight = hWheelFrontRight - hWheelBackRight; 
+		dHeightFront = hWheelFrontLeft - hWheelFrontRight; dHeightBack = hWheelBackLeft - hWheelBackRight; 
+		//float dHeightCrossqb = abs(hWheelFrontLeft - hWheelBackRight); float dHeightCrossdp = abs(hWheelFrontRight - hWheelBackLeft);
+
+		modelMatrixLamboChasis[3][1] = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0],modelMatrixLamboChasis[3][2]);// + (hWheelFrontLeft - hWheelBackRight);
+		//modelMatrixLamboChasis[3][1] = (dHeightCrossqb > dHeightCrossdp ? dHeightCrossqb : dHeightCrossdp);
+
+		dHX = (abs(dHeightLeft) > abs(dHeightRight) ? dHeightLeft : dHeightRight);
+		dHZ = (abs(dHeightFront) > abs(dHeightBack) ? dHeightFront : dHeightBack);
+
+		modelMatrixLamboChasis = glm::rotate(modelMatrixLamboChasis, glm::sin(dHX), glm::vec3(1.0f,0.0f,0.0f));
+		modelMatrixLamboChasis = glm::rotate(modelMatrixLamboChasis, glm::sin(dHZ), glm::vec3(0.0f,0.0f,1.0f));*/
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		modelMatrixLamboChasis = glm::scale(modelMatrixLamboChasis, glm::vec3(1.3, 1.3, 1.3));
+		
 		modelLambo.render(modelMatrixLamboChasis);
+		modelLamboFrontLeftWheel.render(modelMatrixLamboChasis);
+		modelLamboFrontRightWheel.render(modelMatrixLamboChasis);
+		modelLamboRearLeftWheel.render(modelMatrixLamboChasis);
+		modelLamboRearRightWheel.render(modelMatrixLamboChasis);
+
 		glActiveTexture(GL_TEXTURE0);
 		glm::mat4 modelMatrixLamboLeftDor = glm::mat4(modelMatrixLamboChasis);
 		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(1.08866, 0.705743, 0.968917));
@@ -988,10 +1052,6 @@ void applicationLoop() {
 		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(-1.08866, -0.705743, -0.968917));
 		modelLamboLeftDor.render(modelMatrixLamboLeftDor);
 		modelLamboRightDor.render(modelMatrixLamboChasis);
-		modelLamboFrontLeftWheel.render(modelMatrixLamboChasis);
-		modelLamboFrontRightWheel.render(modelMatrixLamboChasis);
-		modelLamboRearLeftWheel.render(modelMatrixLamboChasis);
-		modelLamboRearRightWheel.render(modelMatrixLamboChasis);
 		// Se regresa el cull faces IMPORTANTE para las puertas
 		glEnable(GL_CULL_FACE);
 
