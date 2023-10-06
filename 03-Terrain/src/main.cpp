@@ -91,6 +91,8 @@ Model modelBuzzLeftArm;
 Model modelBuzzLeftForeArm;
 Model modelBuzzLeftHand;
 // Modelos animados
+//Leon
+Model modelLeonKen;
 // Mayow
 Model mayowModelAnimate;
 // Cowboy
@@ -100,7 +102,7 @@ Model guardianModelAnimate;
 // Cybog
 Model cyborgModelAnimate;
 //Terrenos de la abuela
-Terrain terrain(0,0,200, 8,"../Textures/heightmap.png");
+Terrain terrain(0,0,200, 4,"../Textures/heightmap2.png");
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
@@ -136,8 +138,9 @@ glm::mat4 modelMatrixMayow = glm::mat4(1.0f);
 glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 glm::mat4 modelMatrixGuardian = glm::mat4(1.0f);
 glm::mat4 modelMatrixCyborg = glm::mat4(1.0f);
+glm::mat4 modelMatrixLeon = glm::mat4(1.0f);
 
-int animationMayowIndex = 1;
+int animationMayowIndex = 1, animationLeonIndex = 0;
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 float rotBuzzHead = 0.0, rotBuzzLeftarm = 0.0, rotBuzzLeftForeArm = 0.0, rotBuzzLeftHand = 0.0;
 int modelSelected = 0;
@@ -348,6 +351,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelBuzzLeftForeArm.setShader(&shaderMulLighting);
 	modelBuzzLeftHand.loadModel("../models/buzz/buzzlightyLeftHand.obj");
 	modelBuzzLeftHand.setShader(&shaderMulLighting);
+
+	modelLeonKen.loadModel("../models/LeonKennedy/Kennedy.fbx");
+	modelLeonKen.setShader(&shaderMulLighting);
 
 	// Mayow
 	mayowModelAnimate.loadModel("../models/mayow/personaje2.fbx");
@@ -582,6 +588,7 @@ void destroy() {
 	cowboyModelAnimate.destroy();
 	guardianModelAnimate.destroy();
 	cyborgModelAnimate.destroy();
+	modelLeonKen.destroy();
 	terrain.destroy();
 
 	// Textures Delete
@@ -788,7 +795,7 @@ bool processInput(bool continueApplication) {
 		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.0, 0.0, -0.02));
 
 	// Controles de mayow
-	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+	/*if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
 		modelMatrixMayow = glm::rotate(modelMatrixMayow, 0.02f, glm::vec3(0, 1, 0));
 		animationMayowIndex = 0;
 	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
@@ -802,6 +809,22 @@ bool processInput(bool continueApplication) {
 	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
 		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.0, 0.0, -0.02));
 		animationMayowIndex = 0;
+	}*/
+	// Controles de Kennedy
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+		modelMatrixLeon = glm::rotate(modelMatrixLeon, 0.02f, glm::vec3(0, 1, 0));
+		animationLeonIndex = 1;
+	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+		modelMatrixLeon = glm::rotate(modelMatrixLeon, -0.02f, glm::vec3(0, 1, 0));
+		animationLeonIndex = 1;
+	}
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, 0.02));
+		animationLeonIndex = 1;
+	}
+	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, -0.02));
+		animationLeonIndex = 1;
 	}
 
 	glfwPollEvents();
@@ -1140,10 +1163,26 @@ void applicationLoop() {
 		/*****************************************
 		 * Objetos animados por huesos
 		 * **************************************/
-		modelMatrixMayow[3][1] = terrain.getHeightTerrain(modelMatrixMayow[3][0],modelMatrixMayow[3][2]);
-		glm::vec3 axisY = glm::normalize(terrain.getNormalTerrain(modelMatrixMayow[3][0],modelMatrixMayow[3][2]));
-		glm::vec3 axisZ = glm::normalize(modelMatrixMayow[2]);
+
+		//Leon
+		modelMatrixLeon[3][1] = terrain.getHeightTerrain(modelMatrixLeon[3][0],modelMatrixLeon[3][2]);
+		glm::vec3 axisY = glm::normalize(terrain.getNormalTerrain(modelMatrixLeon[3][0],modelMatrixLeon[3][2]));
+		glm::vec3 axisZ = glm::normalize(modelMatrixLeon[2]);
 		glm::vec3 axisX = glm::normalize(glm::cross(axisY,axisZ));
+		axisZ = glm::normalize(glm::cross(axisX,axisY));
+		modelMatrixLeon[0] = glm::vec4(axisX, 0);
+		modelMatrixLeon[1] = glm::vec4(axisY, 0);
+		modelMatrixLeon[2] = glm::vec4(axisZ, 0);
+
+		glm::mat4 modelMatrixLeonBody = glm::scale(modelMatrixLeon, glm::vec3(0.0025f));
+		modelLeonKen.setAnimationIndex(animationLeonIndex);
+		modelLeonKen.render(modelMatrixLeonBody);
+		animationLeonIndex = 0;
+
+		modelMatrixMayow[3][1] = terrain.getHeightTerrain(modelMatrixMayow[3][0],modelMatrixMayow[3][2]);
+		axisY = glm::normalize(terrain.getNormalTerrain(modelMatrixMayow[3][0],modelMatrixMayow[3][2]));
+		axisZ = glm::normalize(modelMatrixMayow[2]);
+		axisX = glm::normalize(glm::cross(axisY,axisZ));
 		axisZ = glm::normalize(glm::cross(axisX,axisY));
 		modelMatrixMayow[0] = glm::vec4(axisX, 0);
 		modelMatrixMayow[1] = glm::vec4(axisY, 0);
