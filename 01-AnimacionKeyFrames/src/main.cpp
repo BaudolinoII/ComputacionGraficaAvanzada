@@ -58,6 +58,7 @@ Box boxCesped;
 Box boxWalls;
 Box boxHighway;
 Box boxLandingPad;
+Box boxSpongeBob;
 Sphere esfera1(10, 10);
 // Models complex instances
 Model modelRock;
@@ -86,7 +87,7 @@ Model modelDartLegoLeftLeg;
 Model modelDartLegoRightLeg;
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
-GLuint skyboxTextureID;
+GLuint skyboxTextureID, textureWaterID, textureSpongeID;
 
 GLenum types[6] = {
 GL_TEXTURE_CUBE_MAP_POSITIVE_X,
@@ -229,6 +230,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	boxWalls.init();
 	boxWalls.setShader(&shaderMulLighting);
 
+	boxSpongeBob.init();
+	boxSpongeBob.setShader(&shaderMultLightMulTexture);
+
 	boxHighway.init();
 	boxHighway.setShader(&shaderMulLighting);
 
@@ -293,6 +297,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelDartLegoRightLeg.setShader(&shaderMulLighting);
 
 	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
+	
 	
 	// Carga de texturas para el skybox
 	Texture skyboxTexture = Texture("");
@@ -452,6 +457,43 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 		std::cout << "Fallo la carga de textura" << std::endl;
 	textureLandingPad.freeImage(); // Liberamos memoria
 
+	Texture textureWater("../Textures/water.jpg");
+	textureWater.loadImage(); // Cargar la textura
+	glGenTextures(1, &textureWaterID); // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, textureWaterID); // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if(textureWater.getData()){
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, textureWater.getChannels() == 3 ? GL_RGB : GL_RGBA, textureWater.getWidth(), textureWater.getHeight(), 0,
+		textureWater.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureWater.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else 
+		std::cout << "Fallo la carga de textura" << std::endl;
+	textureWater.freeImage(); // Liberamos memoria
+
+	Texture textureSponge("../Textures/sponge.jpg");
+	textureSponge.loadImage(); // Cargar la textura
+	
+	glGenTextures(1, &textureSpongeID); // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, textureSpongeID); // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if(textureSponge.getData()){
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, textureSponge.getChannels() == 3 ? GL_RGB : GL_RGBA, textureSponge.getWidth(), textureSponge.getHeight(), 0,
+		textureSponge.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureSponge.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else 
+		std::cout << "Fallo la carga de textura" << std::endl;
+	textureSponge.freeImage(); // Liberamos memoria
+
 }
 
 void destroy() {
@@ -470,6 +512,7 @@ void destroy() {
 	skyboxSphere.destroy();
 	boxCesped.destroy();
 	boxWalls.destroy();
+	boxSpongeBob.destroy();
 	boxHighway.destroy();
 	boxLandingPad.destroy();
 	esfera1.destroy();
@@ -857,6 +900,19 @@ void applicationLoop() {
 		boxHighway.setPosition(glm::vec3(0.0, 0.05, -35.0));
 		boxHighway.setOrientation(glm::vec3(0.0, 0.0, 0.0));
 		boxHighway.render();
+
+		/*******************************************
+		 * Esponja con Agua
+		*********************************************/
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureSpongeID);
+		shaderMultLightMulTexture.setInt("texture1", 3);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, textureWaterID);
+		shaderMultLightMulTexture.setInt("texture2", 0);
+		boxSpongeBob.setScale(glm::vec3(3.0, 3.0, 3.0));
+		boxSpongeBob.setPosition(glm::vec3(0.0f, 2.0f, -15.0f));
+		boxSpongeBob.render();
 
 		/*******************************************
 		 * Esfera 1
