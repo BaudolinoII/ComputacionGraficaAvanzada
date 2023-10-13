@@ -88,6 +88,7 @@ float Terrain::getHeight(int x, int z, unsigned char * data, int imageWidth, int
 	float b = data[x * 4 + z * (imageWidth * 4)];
 	float g = data[x * 4 + z * (imageWidth * 4) + 1];
 	float r = data[x * 4 + z * (imageWidth * 4) + 2];
+	//float height = r;
 	float height = b * g * r;
 	height /= MAX_PIXEL_COLOR;
 	//height -= 0.5;

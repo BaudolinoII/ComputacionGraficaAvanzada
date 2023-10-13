@@ -54,7 +54,7 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform vec3 viewPos;
   
-uniform vec2 scaleUV;
+uniform vec2 scaleUV;  
   
 uniform sampler2D backgroundTexture;
 uniform sampler2D textureR;
@@ -75,7 +75,7 @@ vec3 calculateDirectionalLight(Light light, vec3 direction){
 	vec4 colorTextureG = texture(textureG, tiledCoords) * blendMapColor.g;
 	vec4 colorTextureB = texture(textureB, tiledCoords) * blendMapColor.b;
 	vec4 totalColor = colorTextureBackground + colorTextureR + colorTextureG + colorTextureB;
-
+	
 	//vec4 backgroundTextureColor = texture(backgroundTexture, tiledCoords);
 	//vec4 totalColor = backgroundTextureColor;
 
