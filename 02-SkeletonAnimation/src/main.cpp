@@ -228,8 +228,7 @@ const float giroLambo = 0.5f;
 
 // Se definen todos las funciones.
 void reshapeCallback(GLFWwindow *Window, int widthRes, int heightRes);
-void keyCallback(GLFWwindow *window, int key, int scancode, int action,
-		int mode);
+void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 void mouseButtonCallback(GLFWwindow *window, int button, int state, int mod);
 void init(int width, int height, std::string strTitle, bool bFullScreen);
@@ -939,21 +938,17 @@ bool processInput(bool continueApplication) {
 	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
 		modelMatrixLeon = glm::rotate(modelMatrixLeon, 0.02f, glm::vec3(0, 1, 0));
 		animationLeonIndex = 1;
-		//std::cout << "Control Leon Activado\n";
 	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
 		modelMatrixLeon = glm::rotate(modelMatrixLeon, -0.02f, glm::vec3(0, 1, 0));
 		animationLeonIndex = 1;
-		//std::cout << "Control Leon Activado\n";
 	}
 	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
 		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, 0.02));
 		animationLeonIndex = 1;
-		//std::cout << "Control Leon Activado\n";
 	}
 	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
 		modelMatrixLeon = glm::translate(modelMatrixLeon, glm::vec3(0.0, 0.0, -0.02));
 		animationLeonIndex = 1;
-		//std::cout << "Control Leon Activado\n";
 	}
 	glfwPollEvents();
 	return continueApplication;
